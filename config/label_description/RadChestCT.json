@@ -1,0 +1,18 @@
+{
+    "medical material": "Foreign objects intentionally placed in the body for therapeutic purposes (e.g., surgical clips, pacemakers, catheters, orthopedic hardware). Visible on imaging as artificial structures.",
+    "calcification": "Pathological deposition of calcium salts in tissues, appearing as high-density foci on imaging. Atherosclerosis is the most common cause (vascular calcification), but can also occur in benign lesions, malignancies, or inflammatory conditions.",
+    "cardiomegaly": "Abnormal enlargement of the heart volume, commonly measured by cardiothoracic ratio >0.5 on chest X-ray. Causes include hypertension, valvular disease, and cardiomyopathy.",
+    "pericardial effusion":  "Abnormal fluid accumulation in the pericardial sac surrounding the heart. May cause cardiac tamponade if large.",
+    "hiatal hernia": "Protrusion of abdominal structures (typically stomach fundus) through the esophageal hiatus of the diaphragm into the thoracic cavity.",
+    "lymphadenopathy": "Abnormal lymph node enlargement (>1cm short axis). Categorized as reactive, infectious, or malignant based on size, shape and distribution.",
+    "emphysema": "Permanent destruction of alveolar walls and terminal airspace enlargement. Key component of COPD, characterized by decreased lung attenuation on CT.",
+    "atelectasis": "Partial or complete collapse of lung tissue due to airway obstruction, compression, or surfactant deficiency. Causes reduced lung volume and air bronchogram absence.",
+    "lung nodule": "Discrete pulmonary opacity ≤3cm in diameter. Requires monitoring for malignant features (spiculation, growth) versus benign causes.",
+    "lung opacity": "Nonspecific term for any region of increased lung attenuation on imaging. Includes ground-glass opacity and consolidation patterns.",
+    "pulmonary fibrotic sequela": "Post-inflammatory scarring with fibroblast proliferation causing irreversible architectural distortion and reticulation.",
+    "pleural effusion": "Abnormal fluid accumulation in the pleural cavity. Classified as transudate or exudate based on Light's criteria.",
+    "peribronchial thickening": "Increased bronchial wall thickness (>1-2mm) due to inflammation, edema or fibrosis. Common in asthma and chronic bronchitis.",
+    "consolidation": "Replacement of alveolar air by fluid, cells or tissue. Manifests as homogeneous lung opacification with air bronchograms.",
+    "bronchiectasis": "Irreversible bronchial dilation with wall thickening. Classified as cylindrical, varicose or cystic. Causes chronic cough and recurrent infections.",
+    "interlobular septal thickening": "Thickening of fibrous septa separating secondary pulmonary lobules. Appears as linear opacities perpendicular to pleura on CT."
+  }

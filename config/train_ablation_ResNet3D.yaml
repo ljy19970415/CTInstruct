@@ -1,0 +1,264 @@
+task_list: ["SARS-COV_disease_classification","UCSD-AI4H_disease_classification","RadImageNet_disease_classification","RadChestCT_disease_classification","CC-CCII_disease_classification","RadGenome_disease_classification","INSPECT_image_text","RP3D_image_text","CTRATE_image_text","AbdomenCT1K_structure_segmentation", "CTORG_structure_segmentation", "ATM22_structure_segmentation", "BTCV_structure_segmentation", "AMOS22CT_structure_segmentation", "MM-WHS-CT_structure_segmentation", "LUNA16_structure_segmentation", "FLARE22_structure_segmentation", "WORD_structure_segmentation", "RibFrac_disease_segmentation", "MSD-Lung_disease_segmentation", "MSD-Liver_disease_segmentation", "MSD-Pancreas_disease_segmentation", "MSD-Colon_disease_segmentation", "NSCLC_disease_segmentation", "COVID19_disease_segmentation", "KiTS23_disease_segmentation", "AutoPET_segmentation", "TotalSegmentor_segmentation", "SegThor_segmentation", "SEGA_segmentation", "PARSE22_segmentation", "PancreasCT_segmentation", "MSD-HepaticVessel_segmentation", "LNDB_segmentation", "KIPA22_segmentation", "Hecktor22_segmentation", "FUMPE_segmentation", "DAP_segmentation", "CTPelvic_segmentation"]
+max_iters: 100000  # should be same in optimizer ,"COVID19_disease_segmentation","MM-WHS-CT_structure_segmentation"
+
+## load and save model ###
+savedir: "./checkpoint/encoder_ResNet3D"
+tensorboard_path: "./tensorboard/encoder_ResNet3D"
+eval_output_dir: "./test_out/encoder_ResNet3D"
+
+ckpt: null
+resume_from_step: 0
+eval_interval: 5000 # also is save interval 5000
+eval_iter_per_task: 
+  segmentation: 2
+  classification: 5
+  image_text: 5 # 50
+
+vision_checkpoint: "./checkpoint/vision_encoder.pth"
+
+batchsize:
+  segmentation: 1
+  classification:
+    RadChestCT_disease_classification: 2
+    CC-CCII_disease_classification: 2
+    RadGenome_disease_classification: 2
+  image_text: 2
+
+multi_task_grad_interval: 8
+
+crop_size: [128,128,128]
+patch_max: 6
+temp: 0.07
+mlm_probability: 0.15
+queue_size: 512
+momentum: 0.995
+alpha: 0.4
+vision_width: 2048
+embed_dim: 768
+
+tokenizer_max_length: 512
+only_ita: False
+
+## DINO config ##
+local_crops_number: 8
+dino_warmup_iters: 0
+dino_outdim: 65536
+warmup_teacher_temp: 0.04
+teacher_temp: 0.04
+warmup_teacher_temp_iters: 0
+freeze_last_layer: 10000
+
+deepspeed_config: 
+  train_batch_size: 128
+  train_micro_batch_size_per_gpu: 2
+  gradient_clipping: 1.0 # 1.0 auto
+
+  fp16: 
+    enabled: true
+    loss_scale: 0
+    initial_scale_power: 16
+    loss_scale_window: 1000
+    hysteresis: 2
+    min_loss_scale: 1
+  bf16:
+    enabled: false
+  zero_optimization:
+    stage: 2
+    overlap_comm: true
+    contiguous_gradients: true
+  # '''
+  optimizer: 
+    type : "AdamW" # AdamW, Adam, SGD
+    params: 
+      lr: 0.0001 # 0.0001
+      betas: [0.9, 0.999]
+      eps: 0.00000001
+      weight_decay: 0.0001
+
+  scheduler: 
+    type: "WarmupCosineLR"
+    params:
+      total_num_steps : 100000
+      warmup_min_ratio: 0.0 #warmup start learning rate ratio
+      warmup_num_steps: 1000
+      warmup_type: log
+      cos_min_ratio : 0.0001 # ended learning rate after total iters 0.0001
+
+sampleweight_dict:
+  RP3D_image_text: 5
+  CTRATE_image_text: 6
+  INSPECT_image_text: 6
+  RadImageNet_disease_classification: 2
+  UCSD-AI4H_disease_classification: 1 
+  SARS-COV_disease_classification: 1
+  RadChestCT_disease_classification: 2
+  CC-CCII_disease_classification: 1 
+  RadGenome_disease_classification: 2
+  AbdomenCT1K_structure_segmentation: 2
+  CTORG_structure_segmentation: 2
+  ATM22_structure_segmentation: 1
+  BTCV_structure_segmentation: 1
+  AMOS22CT_structure_segmentation: 1
+  MM-WHS-CT_structure_segmentation: 1
+  LUNA16_structure_segmentation: 1
+  FLARE22_structure_segmentation: 1
+  WORD_structure_segmentation: 1
+  RibFrac_disease_segmentation: 1
+  MSD-Lung_disease_segmentation: 1
+  MSD-Liver_disease_segmentation: 1
+  MSD-Pancreas_disease_segmentation: 1
+  MSD-Colon_disease_segmentation: 1
+  NSCLC_disease_segmentation: 1
+  COVID19_disease_segmentation: 1
+  KiTS23_disease_segmentation: 1
+  AutoPET_segmentation: 1
+  HanSeg_segmentation: 1
+  TotalSegmentor_segmentation: 4
+  SegThor_segmentation: 1
+  SEGA_segmentation: 1
+  PARSE22_segmentation: 1
+  PancreasCT_segmentation: 1
+  MSD-HepaticVessel_segmentation: 1
+  LNDB_segmentation: 1
+  KIPA22_segmentation: 1
+  Hecktor22_segmentation: 1
+  FUMPE_segmentation: 1
+  DAP_segmentation: 4
+  CTPelvic_segmentation: 1
+
+meta_data_dict:
+  RP3D_image_text: "./data/instruction/image_text_RP3D.json"
+  CTRATE_image_text: "./data/instruction/image_text_CTRATE_report.json"
+  INSPECT_image_text: "./data/instruction/image_text_INSPECT.json"
+  RadImageNet_disease_classification: "./data/instruction/disease_classification_Radimagenet.json"
+  SARS-COV_disease_classification: "./data/instruction/disease_classification_SARS-COV.json"
+  UCSD-AI4H_disease_classification: "./data/instruction/disease_classification_UCSD-AI4H-COVID-CT.json"
+  RadChestCT_disease_classification: "./data/instruction/disease_classification_RadChestCT.json"
+  CC-CCII_disease_classification: "./data/instruction/disease_classification_CC-CCII.json"
+  RadGenome_disease_classification: "./data/instruction/disease_classification_RadGenomeCT18.json"
+  AbdomenCT1K_structure_segmentation: "./data/instruction/structure_segmentation_AbdomenCT1K.json"
+  CTORG_structure_segmentation: "./data/instruction/structure_segmentation_CTORG.json"
+  ATM22_structure_segmentation: "./data/instruction/structure_segmentation_ATM22.json"
+  BTCV_structure_segmentation: "./data/instruction/structure_segmentation_BTCV.json"
+  AMOS22CT_structure_segmentation:  "./data/instruction/structure_segmentation_AMOS22CT.json"
+  MM-WHS-CT_structure_segmentation: "./data/instruction/structure_segmentation_MM-WHS-CT.json"
+  LUNA16_structure_segmentation: "./data/instruction/structure_segmentation_LUNA16.json"
+  FLARE22_structure_segmentation: "./data/instruction/structure_segmentation_FLARE22.json"
+  WORD_structure_segmentation: "./data/instruction/structure_segmentation_WORD.json"
+  RibFrac_disease_segmentation: "./data/instruction/disease_segmentation_RibFrac.json"
+  MSD-Lung_disease_segmentation: "./data/instruction/disease_segmentation_MSD-Lung.json"
+  MSD-Liver_disease_segmentation: "./data/instruction/disease_segmentation_MSD-Liver.json"
+  MSD-Pancreas_disease_segmentation: "./data/instruction/disease_segmentation_MSD-Pancreas.json"
+  MSD-Colon_disease_segmentation: "./data/instruction/disease_segmentation_MSD-Colon.json"
+  NSCLC_disease_segmentation: "./data/instruction/disease_segmentation_NSCLC.json"
+  COVID19_disease_segmentation: "./data/instruction/segmentation_COVID19.json"
+  KiTS23_disease_segmentation: "./data/instruction/disease_segmentation_KiTS23.json"
+  AutoPET_segmentation: "./data/instruction/segmentation_autoPET.json"
+  HanSeg_segmentation: "./data/instruction/segmentation_HAN_Seg.json"
+  TotalSegmentor_segmentation: "./data/instruction/segmentation_TotalSegmentator_v2.json"
+  SegThor_segmentation: "./data/instruction/segmentation_SegTHOR.json"
+  SEGA_segmentation: "./data/instruction/segmentation_SEGA.json"
+  PARSE22_segmentation: "./data/instruction/segmentation_PARSE2022.json"
+  PancreasCT_segmentation: "./data/instruction/segmentation_Pancreas_CT.json"
+  MSD-HepaticVessel_segmentation: "./data/instruction/segmentation_MSD_HepaticVessel.json"
+  LNDB_segmentation: "./data/instruction/segmentation_LNDb.json"
+  KIPA22_segmentation: "./data/instruction/segmentation_KiPA22.json"
+  Hecktor22_segmentation: "./data/instruction/segmentation_Hecktor2022.json"
+  FUMPE_segmentation: "./data/instruction/segmentation_FUMPE.json"
+  DAP_segmentation: "./data/instruction/segmentation_DAP_Atlas.json"
+  CTPelvic_segmentation: "./data/instruction/segmentation_CTPelvic1K.json"
+
+criterion_dict:
+  RadImageNet_disease_classification: CE
+  SARS-COV_disease_classification: CE
+  UCSD-AI4H_disease_classification: CE
+  RadChestCT_disease_classification: BCE
+  CC-CCII_disease_classification: CE
+  RadGenome_disease_classification: BCE
+  #structure segmentation
+  ATM22_structure_segmentation: BinaryDice_with_BCE
+  BTCV_structure_segmentation: BinaryDice_with_BCE
+  AMOS22CT_structure_segmentation:  BinaryDice_with_BCE
+  MM-WHS-CT_structure_segmentation: BinaryDice_with_BCE
+  LUNA16_structure_segmentation: BinaryDice_with_BCE
+  FLARE22_structure_segmentation: BinaryDice_with_BCE
+  WORD_structure_segmentation: BinaryDice_with_BCE
+  AbdomenCT1K_structure_segmentation: BinaryDice_with_BCE
+  CTORG_structure_segmentation: BinaryDice_with_BCE
+  RibFrac_disease_segmentation: BinaryDice_with_BCE
+  MSD-Lung_disease_segmentation: BinaryDice_with_BCE
+  MSD-Liver_disease_segmentation: BinaryDice_with_BCE
+  MSD-Pancreas_disease_segmentation: BinaryDice_with_BCE
+  MSD-Colon_disease_segmentation: BinaryDice_with_BCE
+  NSCLC_disease_segmentation: BinaryDice_with_BCE
+  COVID19_disease_segmentation: BinaryDice_with_BCE
+  KiTS23_disease_segmentation: BinaryDice_with_BCE
+  AutoPET_segmentation: BinaryDice_with_BCE
+  HanSeg_segmentation: BinaryDice_with_BCE
+  TotalSegmentor_segmentation: BinaryDice_with_BCE
+  SegThor_segmentation: BinaryDice_with_BCE
+  SEGA_segmentation: BinaryDice_with_BCE
+  PARSE22_segmentation: BinaryDice_with_BCE
+  PancreasCT_segmentation: BinaryDice_with_BCE
+  MSD-HepaticVessel_segmentation: BinaryDice_with_BCE
+  LNDB_segmentation: BinaryDice_with_BCE
+  KIPA22_segmentation: BinaryDice_with_BCE
+  Hecktor22_segmentation: BinaryDice_with_BCE
+  FUMPE_segmentation: BinaryDice_with_BCE
+  DAP_segmentation: BinaryDice_with_BCE
+  CTPelvic_segmentation: BinaryDice_with_BCE
+
+label_dict:
+  RadImageNet_disease_classification: ["fat containing tumor in the abdomen", "post op in the abdomen", "adrenal pathology in the abdomen", "bil dil in the abdomen", "osseous neoplasm in the abdomen", "ovarian pathology in the abdomen", "soft tissue collection in the abdomen", "bowel inflammation in the abdomen", "gallbladder pathology in the abdomen", "gallstone in the abdomen", "prostate lesion in the abdomen", "renal lesion in the abdomen", "soft tissue mass in the abdomen", "degenerative changes in the abdomen", "abnormal entire organ in the abdomen", "bowel abnormality in the abdomen", "dilated urinary tract in the abdomen", "splenic lesion in the abdomen", "ascites in the abdomen", "pancreatic lesion in the abdomen", "arterial pathology in the abdomen", "bowel mass in the abdomen", "intraperitoneal mass in the abdomen", "liver lesion in the abdomen", "urolithiasis in the abdomen", "uterine pathology in the abdomen", "bladder pathology in the abdomen", "normal in the abdomen", "airspace opacity in the lung", "nodule in the lung", "parenchyma destruction in the lung", "bronchiectasis in the lung", "interstitial lung disease in the lung", "normal in the lung"]
+  SARS-COV_disease_classification: ['affected COVID','not affected COVID']
+  UCSD-AI4H_disease_classification:  ['affected COVID','not affected COVID'] # ['affected COVID', 'not affected COVID']
+  RadChestCT_disease_classification: ["medical material", "calcification", "cardiomegaly", "pericardial effusion", "hiatal hernia", "lymphadenopathy", "emphysema", "atelectasis", "lung nodule", "lung opacity", "pulmonary fibrotic sequela", "pleural effusion", "peribronchial thickening", "consolidation", "bronchiectasis", "interlobular septal thickening"]
+  CC-CCII_disease_classification: ["novel coronavirus pneumonia","common pneumonia","normal"]
+  RadGenome_disease_classification: ["medical material","arterial wall calcification","cardiomegaly","pericardial effusion","coronary artery wall calcification","hiatal hernia","lymphadenopathy","emphysema","atelectasis","lung nodule","lung opacity","pulmonary fibrotic sequela","pleural effusion","mosaic attenuation pattern","peribronchial thickening","consolidation","bronchiectasis","interlobular septal thickening"]
+  #structure segmentation
+  AbdomenCT1K_structure_segmentation: ["liver","kidney","spleen","pancreas"]
+  CTORG_structure_segmentation: ["liver","urinary bladder","lung","kidney","bone","brain"]
+  ATM22_structure_segmentation: ["airway tree"]
+  BTCV_structure_segmentation: ["spleen","right kidney","left kidney","gallbladder","esophagus","liver","stomach","aorta","inferior vena cava","portal vein and splenic vein","pancreas","right adrenal gland","left adrenal gland","kidney","adrenal gland"]
+  AMOS22CT_structure_segmentation:  ["spleen","right kidney","left kidney","gallbladder","esophagus","liver","stomach","aorta","inferior vena cava","pancreas","right adrenal gland","left adrenal gland","duodenum","urinary bladder","kidney","adrenal gland"]
+  MM-WHS-CT_structure_segmentation: ["myocardium","left heart atrium","left heart ventricle","right heart atrium","right heart ventricle","heart ascending aorta","pulmonary artery","heart atrium","heart ventricle"]
+  LUNA16_structure_segmentation: ["left lung","right lung","trachea","lung"]
+  FLARE22_structure_segmentation: ["Liver", "Right kidney", "Spleen","Pancreas","Aorta","Inferior Vena Cava","Right Adrenal Gland","Left Adrenal Gland","Gallbladder","Esophagus","Stomach","Duodenum","Left kidney","Kidney","Adrenal Gland"]
+  WORD_structure_segmentation: ["liver","spleen","left kidney","right kidney","stomach","gallbladder","esophagus","pancreas","duodenum","colon","intestine","adrenal gland","rectum","urinary bladder","head of left femur","head of right femur","kidney","head of femur"]
+  RibFrac_disease_segmentation: ["rib fraction"]
+  MSD-Lung_disease_segmentation: ["lung tumor"]
+  MSD-Liver_disease_segmentation: ["liver","liver_tumor"]
+  MSD-Pancreas_disease_segmentation: ["pancreas","pancreas tumor"]
+  MSD-Colon_disease_segmentation: ["colon tumor"]
+  NSCLC_disease_segmentation: ["thoracic cavity","lung effusion"]
+  COVID19_disease_segmentation: ["left lung","right lung","COVID-19 infection","lung"]
+  KiTS23_disease_segmentation: ["kidney","kidney tumor","kidney cyst"]
+  AutoPET_segmentation: ["tumor"]
+  HanSeg_segmentation: ["Arytenoid","Brainstem","Buccal Mucosa","Left Carotid artery","Right Carotid artery","Cervical esophagus","Left Cochlea","Right Cochlea","Cricopharyngeal inlet","Left Anterior eyeball","Right Anterior eyeball","Left Posterior eyeball","Right Posterior eyeball","Left Lacrimal gland","Right Lacrimal gland","larynx glottis","larynx supraglottis","Lips","Mandible","Optic chiasm","Left Optic nerve","Right Optic nerve","Oral cavity","Left Parotid gland","Right Parotid gland","Pituitary gland","Spinal cord","Left Submandibular gland","Right Submandibular gland","Thyroid","Carotid artery","Cochlea","Anterior eyeball","Posterior eyeball","Lacrimal gland","Optic nerve","Parotid gland","Submandibular gland","Left Eyeball","Right Eyeball","Eyeball"]
+  TotalSegmentor_segmentation: ["left auricle of heart","brachiocephalic trunk","left brachiocephalic vein","right brachiocephalic vein","left common carotid artery","right common carotid artery","costal cartilage","heart","left kidney cyst","right kidney cyst","prostate","pulmonary vein","skull","spinal cord","sternum","left subclavian artery","right subclavian artery","superior vena cava","thyroid","sacral vertebrae 1 (S1)","brachiocephalic vein","common carotid artery","kidney cyst","subclavian artery"]
+  SegThor_segmentation: ["esophagus","heart","trachea","aorta"]
+  SEGA_segmentation: ["aorta"]
+  PARSE22_segmentation: ["pulmonary artery"]
+  PancreasCT_segmentation: ["pancreas"]
+  MSD-HepaticVessel_segmentation: ["liver vessel","liver tumor"]
+  LNDB_segmentation: ["lung nodule"]
+  KIPA22_segmentation: ["renal vein","kidney","renal artery","kidney tumor"]
+  Hecktor22_segmentation: ["head and neck tumor","lymph node"]
+  FUMPE_segmentation: ["pulmonary embolism"]
+  DAP_segmentation: ["muscle", "fat", "abdominal tissue", "mediastinal tissue", "esophagus", "stomach", "small bowel", "duodenum", "colon", "gallbladder", "liver", "pancreas", "left kidney", "right kidney", "urinary bladder", "gonad", "prostate", "uterocervix", "uterus", "left breast", "right breast", "spinal canal", "brain", "spleen", "left adrenal gland", "right adrenal gland", "left thyroid", "right thyroid", "thymus", "left gluteus maximus", "right gluteus maximus", "left gluteus medius", "right gluteus medius", "left gluteus minimus", "right gluteus minimus", "left iliopsoas", "right iliopsoas", "left autochthon", "right autochthon", "skin", "cervical vertebrae 1 (c1)", "cervical vertebrae 2 (c2)", "cervical vertebrae 3 (c3)", "cervical vertebrae 4 (c4)", "cervical vertebrae 5 (c5)", "cervical vertebrae 6 (c6)", "cervical vertebrae 7 (c7)", "thoracic vertebrae 1 (t1)", "thoracic vertebrae 2 (t2)", "thoracic vertebrae 3 (t3)", "thoracic vertebrae 4 (t4)", "thoracic vertebrae 5 (t5)", "thoracic vertebrae 6 (t6)", "thoracic vertebrae 7 (t7)", "thoracic vertebrae 8 (t8)", "thoracic vertebrae 9 (t9)", "thoracic vertebrae 10 (t10)", "thoracic vertebrae 11 (t11)", "thoracic vertebrae 12 (t12)", "lumbar vertebrae 1 (l1)", "lumbar vertebrae 2 (l2)", "lumbar vertebrae 3 (l3)", "lumbar vertebrae 4 (l4)", "lumbar vertebrae 5 (l5)", "left rib 1", "right rib 1", "left rib 2", "right rib 2", "left rib 3", "right rib 3", "left rib 4", "right rib 4", "left rib 5", "right rib 5", "left rib 6", "right rib 6", "left rib 7", "right rib 7", "left rib 8", "right rib 8", "left rib 9", "right rib 9", "left rib 10", "right rib 10", "left rib 11", "right rib 11", "left rib 12", "right rib 12", "rib cartilage", "sternum", "left clavicle", "right clavicle", "left scapula", "right scapula", "left humerus", "right humerus", "skull", "left hip", "right hip", "sacrum", "left femur", "right femur", "heart", "left heart atrium", "heart tissue", "right heart atrium", "myocardium", "left heart ventricle", "right heart ventricle", "left iliac artery", "right iliac artery", "aorta", "left iliac vena", "right iliac vena", "inferior vena cava", "portal vein and splenic vein", "celiac trunk", "left lung lower lobe", "left lung upper lobe", "right lung lower lobe", "right lung middle lobe", "right lung upper lobe", "bronchie", "trachea", "pulmonary artery", "left cheek", "right cheek", "left eyeball", "right eyeball", "nasal cavity", "right common carotid artery", "left common carotid artery", "manubrium of sternum", "right internal carotid artery", "left internal carotid artery", "right internal jugular vein", "left internal jugular vein", "brachiocephalic trunk", "right brachiocephalic vein", "left brachiocephalic vein", "right subclavian artery", "left subclavian artery", "kidney", "breast", "adrenal gland", "thyroid", "gluteus maximus", "gluteus medius", "gluteus minimus", "iliopsoas", "autochthon", "rib 1", "rib 2", "rib 3", "rib 4", "rib 5", "rib 6", "rib 7", "rib 8", "rib 9", "rib 10", "rib 11", "rib 12", "clavicle", "scapula", "humerus", "hip", "femur", "heart atrium", "heart ventricle", "iliac artery", "iliac vena", "lung lower lobe", "lung upper lobe", "cheek", "eyeball", "common carotid artery", "internal carotid artery", "internal jugular vein", "brachiocephalic vein", "subclavian artery", "left lung", "right lung", "lung", "cervical vertebrae", "thoracic vertebrae", "lumbar vertebrae", "vertebrae", "left rib", "right rib", "rib"]
+  CTPelvic_segmentation: ["sacrum","left hip","right hip","lumbar vertebrae","hip"]
+
+
+label_description:
+  RadImageNet_disease_classification: "./config/label_description/RadImageNet.json"
+  SARS-COV_disease_classification: "./config/label_description/SARS-COV.json"
+  UCSD-AI4H_disease_classification:  "./config/label_description/SARS-COV.json"
+  RadChestCT_disease_classification: "./config/label_description/RadChestCT.json"
+  CC-CCII_disease_classification: "./config/label_description/CC-CCII,json"
+  RadGenome_disease_classification: "./config/label_description/RadGenome.json"
+  segmentation: "./config/label_description/seg_label_description.json"
+
+flag_2D:
+  RadImageNet_disease_classification: True
+  SARS-COV_disease_classification: True
+  UCSD-AI4H_disease_classification: True

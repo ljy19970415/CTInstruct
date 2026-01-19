@@ -1,0 +1,17 @@
+[
+  {
+      "question": [
+          {
+              "type": "image"
+          },
+          {
+              "type": "text",
+              "text": "What are the findings in the lung parenchyma of the Chest CT image?"
+          }
+      ],
+      "image_path": [
+          "path/to/your/image.nii.gz"
+      ],
+      "answer": "A few millimetric nonspecific nodules and mild recessions are observed in the upper lobe and lower lobe of the right lung."
+  }
+]
